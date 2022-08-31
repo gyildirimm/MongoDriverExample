@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
+using MongoDbDriver.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,13 +21,17 @@ namespace MongoDbDriver.Utilities.Extensions
         public static IServiceCollection AddMongoDbSettings(this IServiceCollection services,
            IConfiguration configuration)
         {
-            return services.Configure<MongoDbSetting>(options =>
+            services.Configure<MongoDbSetting>(options =>
             {
                 options.ConnectionString = configuration
                     .GetSection(nameof(MongoDbSetting) + ":" + MongoDbSetting.ConnectionStringValue).Value;
                 options.Database = configuration
                     .GetSection(nameof(MongoDbSetting) + ":" + MongoDbSetting.DatabaseValue).Value;
             });
+
+            services.AddScoped(typeof(IGenericEntityDal<>), typeof(GenericEntityDal<>));
+
+            return services;
         }
     }
 }
